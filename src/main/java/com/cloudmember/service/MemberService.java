@@ -16,8 +16,8 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
-    private Member findMember(Long memeberId) {
-        return memberRepository.findById(memeberId).orElseThrow(
+    private Member findMember(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(
                 () -> new IllegalStateException("해당 멤버가 존재하지 않습니다.")
         );
     }
