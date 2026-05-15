@@ -4,6 +4,13 @@ spring:
       enabled: true                                     # H2 ? ?? ???
       path: /h2-console                                 # H2 ??? ??? ??
 
+  cloud:
+    aws:
+      s3:
+        enabled: false
+      parameterstore:
+        enabled: false
+
   datasource:
     url: jdbc:h2:mem:test                               # ?????? URL
     username: sa                                        # ?????? ?? ??? ??
