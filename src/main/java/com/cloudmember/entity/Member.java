@@ -1,5 +1,6 @@
 package com.cloudmember.entity;
 
+import com.cloudmember.dto.CreateMemberRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,5 +26,13 @@ public class Member {
         this.name = name;
         this.age = age;
         this.mbti = mbti;
+    }
+
+    public static Member to(CreateMemberRequest request) {
+        return new Member(
+                request.name(),
+                request.age(),
+                request.mbti()
+        );
     }
 }
