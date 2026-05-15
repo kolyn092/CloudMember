@@ -6,10 +6,7 @@ import com.cloudmember.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/members")
@@ -26,5 +23,11 @@ public class MemberController {
         MemberResponse response = memberService.save(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{memberId}")
+    public ResponseEntity<MemberResponse> getOneMember(@PathVariable Long memberId) {
+        MemberResponse response = memberService.getOneMember(memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
