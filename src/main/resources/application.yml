@@ -1,0 +1,16 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+spring:
+  profiles:
+    active: local
+
+logging:
+  level:
+    root: INFO
+
+server:
+  port: 8080
