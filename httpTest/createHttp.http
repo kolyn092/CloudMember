@@ -1,0 +1,18 @@
+### 멤버 생성
+POST http://localhost:8080/api/members
+Content-Type: application/json
+
+{
+  "name": "홍길동",
+  "age": 11,
+  "mbti": "INFP"
+}
+
+### 멤버 생성 오류
+POST http://localhost:8080/api/members
+Content-Type: application/json
+
+{
+  "name": "홍길동",
+  "age": 11
+}
