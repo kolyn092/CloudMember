@@ -8,10 +8,10 @@
 
 ## 📄 API 요약
 
-| Method | URL                         | Desc                          |
-|:-------|:----------------------------|:------------------------------|
-| POST   | /api/members                | 멤버 생성                      |
-| GET    | /api/members/{memberId}     | 특정 멤버 조회                 |
+| Method | URL                     | Desc     |
+|:-------|:------------------------|:---------|
+| POST   | /api/members            | 멤버 생성    |
+| GET    | /api/members/{memberId} | 특정 멤버 조회 |
 
 ---
 
@@ -27,3 +27,8 @@
 
 ![](https://github.com/user-attachments/assets/a9294cfc-36e7-4a26-a1c8-1235d01f8873)
 
+### LV 1 - 네트워크 구축 및 핵심 기능 배포
+
+#### 설정 완료된 EC2
+
+![](https://github.com/user-attachments/assets/cb6680bb-0e6c-43b7-a6e3-85258f415fb9)
