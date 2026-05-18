@@ -1,7 +1,4 @@
 spring:
-  config:
-    import: parameterstore:/cloud-member/prod/
-
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}
@@ -25,3 +22,27 @@ management:
   info:
     env:
       enabled: true
+  health:
+    db:
+      enabled: false
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
