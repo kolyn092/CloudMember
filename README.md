@@ -32,3 +32,13 @@
 #### 설정 완료된 EC2
 
 ![](https://github.com/user-attachments/assets/cb6680bb-0e6c-43b7-a6e3-85258f415fb9)
+
+### LV 2 - DB 분리 및 보안 연결하기
+
+#### Actuator Info 엔드포인트 URL
+
+- http://3.35.206.57:8080/actuator/info
+
+#### RDS 보안 그룹 스크린샷
+
+![](https://github.com/user-attachments/assets/aacaae33-7f87-443d-9825-984f39a8a0b7)
