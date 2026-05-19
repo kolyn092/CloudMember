@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/members")
@@ -25,10 +26,24 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{memberId}")
-    public ResponseEntity<MemberResponse> getOneMember(@PathVariable Long memberId) {
-        MemberResponse response = memberService.getOneMember(memberId);
+    @GetMapping("/{id}")
+    public ResponseEntity<MemberResponse> getOneMember(@PathVariable Long id) {
+        MemberResponse response = memberService.getOneMember(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/{id}/profile-image")
+    public ResponseEntity<Void> uploadProfileImage(@PathVariable Long id, MultipartFile multipartFile) {
+        memberService.uploadProfileImage(id, multipartFile);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/{id}/profile-image")
+    public ResponseEntity<String> getProfileImageUrl(@PathVariable Long id) {
+        String presignedUrl = memberService.getProfileImageUrl(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(presignedUrl);
     }
 }

@@ -18,6 +18,11 @@ spring:
         format_sql: true
         show-sql: true
 
+  cloud:
+    aws:
+      s3:
+        bucket: cloud-member-kolyn-files
+
 management:
   endpoint:
     health:

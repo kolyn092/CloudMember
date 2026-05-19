@@ -22,10 +22,13 @@ public class Member {
 
     private String mbti;
 
+    private String profileImageKey;
+
     public Member(String name, Integer age, String mbti) {
         this.name = name;
         this.age = age;
         this.mbti = mbti;
+        this.profileImageKey = null;
     }
 
     public static Member to(CreateMemberRequest request) {
@@ -34,5 +37,9 @@ public class Member {
                 request.age(),
                 request.mbti()
         );
+    }
+
+    public void updateProfileImageKey(String profileImageKey) {
+        this.profileImageKey = profileImageKey;
     }
 }
