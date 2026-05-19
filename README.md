@@ -42,3 +42,15 @@
 #### RDS 보안 그룹 스크린샷
 
 ![](https://github.com/user-attachments/assets/aacaae33-7f87-443d-9825-984f39a8a0b7)
+
+### LV 3 - 프로필 사진 기능 추가와 권한 관리
+
+#### 발급받은 Presigned URL 및 만료 시간
+
+- [Presigned URL]()
+- 만료 시간 : 0000/00/00 00:00:00
+
+#### 접근 성공 스크린샷
+
+![](https://github.com/user-attachments/assets/874ba260-4712-4541-9d6e-16d58970b38b)
+![](https://github.com/user-attachments/assets/d52cb54b-53c0-459e-b6f8-b6931eadbc2a)
