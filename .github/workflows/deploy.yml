@@ -120,4 +120,5 @@ jobs:
             docker run -d \
               --name cloudmember \
               -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
               $ECR_REGISTRY/$ECR_REPOSITORY:latest
