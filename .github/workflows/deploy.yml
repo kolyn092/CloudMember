@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: cloudmember
+
 jobs:
   # CI: Build & Test
   build:
