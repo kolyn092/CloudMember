@@ -6,7 +6,7 @@ management:
 
 spring:
   profiles:
-    active: local
+    active: prod
 
 logging:
   level:
