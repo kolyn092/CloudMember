@@ -54,3 +54,13 @@
 
 ![](https://github.com/user-attachments/assets/874ba260-4712-4541-9d6e-16d58970b38b)
 ![](https://github.com/user-attachments/assets/d52cb54b-53c0-459e-b6f8-b6931eadbc2a)
+
+### LV 4 - Docker & CI/CD 파이프라인 구축
+
+#### Github Actions 성공 이미지
+
+![](https://github.com/user-attachments/assets/d7695296-3787-4101-8c07-692d2ba33e67)
+
+#### EC2 터미널 이미지
+
+![](https://github.com/user-attachments/assets/691b70fb-0156-4115-a91b-02c51b45d99a)
