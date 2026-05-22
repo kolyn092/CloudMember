@@ -1,5 +1,6 @@
 package com.cloudmember.service;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,9 +12,12 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -33,18 +37,28 @@ public class S3Service {
     @Value("${spring.cloud.aws.cloudfront.key-pair-id}")
     private String keyPairId;
 
-    @Value("${spring.cloud.aws.cloudfront.private-key-path}")
-    private String privateKeyPath;
+    @Value("${spring.cloud.aws.cloudfront.private-key}")
+    private String privateKeyPem;
+
+    private PrivateKey privateKey;
 
     public S3Service(S3Client s3Client) {
         this.s3Client = s3Client;
         this.cloudFrontUtilities = CloudFrontUtilities.create();
     }
 
+    @PostConstruct
+    public void init() {
+        try {
+            this.privateKey = loadPrivateKey(privateKeyPem);
+        } catch (Exception e) {
+            throw new RuntimeException("CloudFront private key 로딩 실패", e);
+        }
+    }
+
     public String uploadProfileImage(Long memberId, MultipartFile file) {
         try {
             String fileName = "uploads/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
-
             String key = "profiles/" + memberId + "/" + fileName;
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -76,7 +90,7 @@ public class S3Service {
 
             CannedSignerRequest signerRequest = CannedSignerRequest.builder()
                     .resourceUrl(resourceUrl)
-                    .privateKey(Path.of(privateKeyPath))
+                    .privateKey(privateKey)
                     .keyPairId(keyPairId)
                     .expirationDate(expirationTime)
                     .build();
@@ -87,5 +101,21 @@ public class S3Service {
         } catch (Exception e) {
             throw new RuntimeException("CloudFront Signed URL 생성 실패", e);
         }
+    }
+
+    private PrivateKey loadPrivateKey(String pem) throws Exception {
+
+        String privateKeyContent = pem
+                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+                .replace("-----END RSA PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+
+        byte[] decoded = Base64.getDecoder().decode(privateKeyContent);
+
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+        return keyFactory.generatePrivate(keySpec);
     }
 }

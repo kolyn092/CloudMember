@@ -10,7 +10,6 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: cloudmember
-  CLOUDFRONT_KEY_PATH: /home/ec2-user/cloudfront/private_key.pem
 
 jobs:
   # CI: Build & Test
@@ -105,21 +104,6 @@ jobs:
         run: |
           echo "password=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})" >> $GITHUB_OUTPUT
 
-      - name: Create CloudFront private key file
-        run: |
-          mkdir -p cloudfront
-          echo "${{ secrets.CLOUDFRONT_PRIVATE_KEY }}" > cloudfront/private_key.pem
-          chmod 644 cloudfront/private_key.pem
-
-      - name: Upload CloudFront private key to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "cloudfront/private_key.pem"
-          target: "/home/ec2-user/cloudfront/"
-
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         env:
@@ -131,17 +115,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: ECR_REGISTRY,ECR_PASSWORD,ECR_REPOSITORY
           script: |
-            mkdir -p /home/ec2-user/cloudfront
-            
             echo $ECR_PASSWORD | docker login --username AWS --password-stdin $ECR_REGISTRY
             docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
-            
             docker stop cloudmember || true
             docker rm cloudmember || true
-            
             docker run -d \
               --name cloudmember \
               -p 8080:8080 \
               -e SPRING_PROFILES_ACTIVE=prod \
-              -e CLOUDFRONT_PRIVATE_KEY_PATH=/home/ec2-user/cloudfront/private_key.pem \
               $ECR_REGISTRY/$ECR_REPOSITORY:latest
