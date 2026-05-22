@@ -25,7 +25,7 @@ spring:
       cloudfront:
         domain: ${CLOUDFRONT_DOMAIN}
         key-pair-id: ${CLOUDFRONT_KEY_PAIR_ID}
-        private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
+        private-key: ${CLOUDFRONT_PRIVATE_KEY}
 
 management:
   endpoint:
