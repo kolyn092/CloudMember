@@ -4,31 +4,41 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.cloudfront.CloudFrontUtilities;
+import software.amazon.awssdk.services.cloudfront.model.CannedSignerRequest;
+import software.amazon.awssdk.services.cloudfront.url.SignedUrl;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
-import java.time.Duration;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
 public class S3Service {
 
-    private static final Duration PRESIGNED_URL_EXPIRATION = Duration.ofDays(7);
+    private static final long SIGNED_URL_EXPIRATION_DAYS = 7;
 
-    private final S3Presigner s3Presigner;
     private final S3Client s3Client;
+    private final CloudFrontUtilities cloudFrontUtilities;
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
 
-    public S3Service(S3Presigner s3Presigner, S3Client s3Client) {
-        this.s3Presigner = s3Presigner;
+    @Value("${spring.cloud.aws.cloudfront.domain}")
+    private String cloudFrontDomain;
+
+    @Value("${spring.cloud.aws.cloudfront.key-pair-id}")
+    private String keyPairId;
+
+    @Value("${spring.cloud.aws.cloudfront.private-key-path}")
+    private String privateKeyPath;
+
+    public S3Service(S3Client s3Client) {
         this.s3Client = s3Client;
+        this.cloudFrontUtilities = CloudFrontUtilities.create();
     }
 
     public String uploadProfileImage(Long memberId, MultipartFile file) {
@@ -59,19 +69,23 @@ public class S3Service {
         }
     }
 
-    public String generatePresignedUrl(String key) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
+    public String generateSignedUrl(String key) {
+        try {
+            String resourceUrl = "https://" + cloudFrontDomain + "/" + key;
+            Instant expirationTime = Instant.now().plus(SIGNED_URL_EXPIRATION_DAYS, ChronoUnit.DAYS);
 
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(PRESIGNED_URL_EXPIRATION)
-                .getObjectRequest(getObjectRequest)
-                .build();
+            CannedSignerRequest signerRequest = CannedSignerRequest.builder()
+                    .resourceUrl(resourceUrl)
+                    .privateKey(Path.of(privateKeyPath))
+                    .keyPairId(keyPairId)
+                    .expirationDate(expirationTime)
+                    .build();
 
-        PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(presignRequest);
+            SignedUrl signedUrl = cloudFrontUtilities.getSignedUrlWithCannedPolicy(signerRequest);
 
-        return presignedGetObjectRequest.url().toString();
+            return signedUrl.url();
+        } catch (Exception e) {
+            throw new RuntimeException("CloudFront Signed URL 생성 실패", e);
+        }
     }
 }

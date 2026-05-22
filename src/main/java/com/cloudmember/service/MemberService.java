@@ -51,6 +51,6 @@ public class MemberService {
     public String getProfileImageUrl(Long memberId) {
         Member member = findMember(memberId);
 
-        return s3Service.generatePresignedUrl(member.getProfileImageKey());
+        return s3Service.generateSignedUrl(member.getProfileImageKey());
     }
 }
