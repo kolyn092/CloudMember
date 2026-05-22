@@ -28,11 +28,6 @@ management:
     health:
       show-details: never
 
-  endpoints:
-    web:
-      exposure:
-        include: info
-
   info:
     env:
       enabled: true
