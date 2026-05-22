@@ -2,11 +2,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: info, health
 
 spring:
   profiles:
-    active: local
+    active: prod
 
 logging:
   level:

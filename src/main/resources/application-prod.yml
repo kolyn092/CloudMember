@@ -22,16 +22,15 @@ spring:
     aws:
       s3:
         bucket: cloud-member-kolyn-files
+      cloudfront:
+        domain: ${CLOUDFRONT_DOMAIN}
+        key-pair-id: ${CLOUDFRONT_KEY_PAIR_ID}
+        private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
 
 management:
   endpoint:
     health:
       show-details: never
-
-  endpoints:
-    web:
-      exposure:
-        include: info
 
   info:
     env:
