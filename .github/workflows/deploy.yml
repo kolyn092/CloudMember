@@ -109,7 +109,7 @@ jobs:
         run: |
           mkdir -p cloudfront
           echo "${{ secrets.CLOUDFRONT_PRIVATE_KEY }}" > cloudfront/private_key.pem
-          chmod 644 cloudfront/private_key.pem
+          chmod 600 cloudfront/private_key.pem
 
       - name: Upload CloudFront private key to EC2
         uses: appleboy/scp-action@v0.1.7
