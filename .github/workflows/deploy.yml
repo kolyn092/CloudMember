@@ -90,7 +90,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: docker
-    
+
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -104,23 +104,37 @@ jobs:
         run: |
           echo "password=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})" >> $GITHUB_OUTPUT
 
-      - name: Deploy to EC2
+      - name: Deploy via Bastion SSH
         uses: appleboy/ssh-action@v1.0.3
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
           ECR_PASSWORD: ${{ steps.ecr-login.outputs.password }}
+          PRIVATE_EC2_HOST: ${{ secrets.PRIVATE_EC2_HOST }}
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          envs: ECR_REGISTRY,ECR_PASSWORD,ECR_REPOSITORY
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.BASTION_USERNAME }}
+          key: ${{ secrets.BASTION_SSH_KEY }}
+          envs: ECR_REGISTRY,ECR_PASSWORD,ECR_REPOSITORY,PRIVATE_EC2_HOST
           script: |
-            echo $ECR_PASSWORD | docker login --username AWS --password-stdin $ECR_REGISTRY
-            docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
-            docker stop cloudmember || true
-            docker rm cloudmember || true
-            docker run -d \
-              --name cloudmember \
-              -p 8080:8080 \
-              -e SPRING_PROFILES_ACTIVE=prod \
-              $ECR_REGISTRY/$ECR_REPOSITORY:latest
+            echo "Connecting to private EC2 via Bastion..."
+
+            ssh -o StrictHostKeyChecking=no ec2-user@$PRIVATE_EC2_HOST << 'EOF'
+
+              echo "Login to ECR"
+              aws ecr get-login-password --region ap-northeast-2 \
+              | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+              echo "Pull latest image"
+              docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+              echo "Restart container"
+              docker stop cloudmember || true
+              docker rm cloudmember || true
+
+              docker run -d \
+                --name cloudmember \
+                -p 8080:8080 \
+                -e SPRING_PROFILES_ACTIVE=prod \
+                $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+            EOF
