@@ -111,7 +111,7 @@ public class S3Service {
 
         log.info("pem key : {}", pem);
 
-        byte[] decoded = Base64.getDecoder().decode(pem);
+        byte[] decoded = Base64.getMimeDecoder().decode(pem);
 
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
 
