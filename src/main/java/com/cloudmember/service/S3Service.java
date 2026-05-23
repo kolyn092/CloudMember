@@ -14,7 +14,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.PrivateKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
