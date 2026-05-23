@@ -40,8 +40,6 @@ public class S3Service {
     @Value("${spring.cloud.aws.cloudfront.private-key}")
     private String privateKeyPem;
 
-    private PrivateKey privateKey;
-
     public S3Service(S3Client s3Client) {
         this.s3Client = s3Client;
         this.cloudFrontUtilities = CloudFrontUtilities.create();
@@ -77,7 +75,7 @@ public class S3Service {
     public String generateSignedUrl(String key) {
         try {
             Path privateKeyPath = Files.createTempFile("cf-key", ".pem");
-            Files.writeString(privateKeyPath, key);
+            Files.writeString(privateKeyPath, privateKeyPem);
             privateKeyPath.toFile().deleteOnExit();
 
             String resourceUrl = "https://" + cloudFrontDomain + "/" + key;
