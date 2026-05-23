@@ -53,8 +53,10 @@ public class S3Service {
     public void init() {
         try {
             this.privateKey = loadPrivateKey(privateKeyPem);
+            log.info("CloudFront PrivateKey 로딩 성공");
         } catch (Exception e) {
-            throw new RuntimeException("CloudFront private key 로딩 실패", e);
+            log.error("CloudFront PrivateKey 로딩 실패", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -109,12 +111,7 @@ public class S3Service {
 
         log.info("pem key : {}", pem);
 
-        String privateKeyContent = pem
-                .replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s", "");
-
-        byte[] decoded = Base64.getDecoder().decode(privateKeyContent);
+        byte[] decoded = Base64.getDecoder().decode(pem);
 
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
 
