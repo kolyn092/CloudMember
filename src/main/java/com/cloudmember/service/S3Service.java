@@ -13,6 +13,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -49,17 +51,6 @@ public class S3Service {
         this.cloudFrontUtilities = CloudFrontUtilities.create();
     }
 
-    @PostConstruct
-    public void init() {
-        try {
-            this.privateKey = loadPrivateKey(privateKeyPem);
-            log.info("CloudFront PrivateKey 로딩 성공");
-        } catch (Exception e) {
-            log.error("CloudFront PrivateKey 로딩 실패", e);
-            throw new RuntimeException(e);
-        }
-    }
-
     public String uploadProfileImage(Long memberId, MultipartFile file) {
         try {
             String fileName = "uploads/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -89,32 +80,27 @@ public class S3Service {
 
     public String generateSignedUrl(String key) {
         try {
+            Path privateKeyPath = Files.createTempFile("cf-key", ".pem");
+            Files.writeString(privateKeyPath, key);
+            privateKeyPath.toFile().deleteOnExit();
+
             String resourceUrl = "https://" + cloudFrontDomain + "/" + key;
-            Instant expirationTime = Instant.now().plus(SIGNED_URL_EXPIRATION_DAYS, ChronoUnit.DAYS);
 
             CannedSignerRequest signerRequest = CannedSignerRequest.builder()
                     .resourceUrl(resourceUrl)
-                    .privateKey(privateKey)
+                    .privateKey(privateKeyPath)
                     .keyPairId(keyPairId)
-                    .expirationDate(expirationTime)
+                    .expirationDate(
+                            Instant.now().plus(SIGNED_URL_EXPIRATION_DAYS, ChronoUnit.DAYS)
+                    )
                     .build();
 
             SignedUrl signedUrl = cloudFrontUtilities.getSignedUrlWithCannedPolicy(signerRequest);
 
             return signedUrl.url();
+
         } catch (Exception e) {
             throw new RuntimeException("CloudFront Signed URL 생성 실패", e);
         }
-    }
-
-    private PrivateKey loadPrivateKey(String pem) throws Exception {
-
-        log.info("pem key : {}", pem);
-
-        byte[] decoded = Base64.getMimeDecoder().decode(pem);
-
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
-
-        return KeyFactory.getInstance("RSA").generatePrivate(keySpec);
     }
 }
