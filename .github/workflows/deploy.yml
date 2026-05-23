@@ -116,11 +116,10 @@ jobs:
           key: ${{ secrets.BASTION_SSH_KEY }}
           envs: ECR_REGISTRY,ECR_PASSWORD,ECR_REPOSITORY,PRIVATE_EC2_HOST
           script: |
-            echo "Connecting to private EC2 via Bastion..."
-
-            ssh -o StrictHostKeyChecking=no ec2-user@$PRIVATE_EC2_HOST << 'EOF'
-
-              echo "Login to ECR"
+            echo "Deploying directly on Bastion context..."
+          
+            ssh -i ec2-key.pem ec2-user@$PRIVATE_EC2_HOST << 'EOF'
+          
               aws ecr get-login-password --region ap-northeast-2 \
               | docker login --username AWS --password-stdin $ECR_REGISTRY
 
