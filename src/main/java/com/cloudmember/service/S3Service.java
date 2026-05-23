@@ -1,6 +1,7 @@
 package com.cloudmember.service;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class S3Service {
 
@@ -105,17 +107,17 @@ public class S3Service {
 
     private PrivateKey loadPrivateKey(String pem) throws Exception {
 
+        log.info("pem key : {}", pem);
+
         String privateKeyContent = pem
-                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
-                .replace("-----END RSA PRIVATE KEY-----", "")
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
 
         byte[] decoded = Base64.getDecoder().decode(privateKeyContent);
 
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
 
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-        return keyFactory.generatePrivate(keySpec);
+        return KeyFactory.getInstance("RSA").generatePrivate(keySpec);
     }
 }
