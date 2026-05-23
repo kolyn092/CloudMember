@@ -120,20 +120,20 @@ jobs:
           
             ssh -i ec2-key.pem ec2-user@$PRIVATE_EC2_HOST << 'EOF'
           
-              aws ecr get-login-password --region ap-northeast-2 \
-              | docker login --username AWS --password-stdin $ECR_REGISTRY
+            aws ecr get-login-password --region ap-northeast-2 \
+            | docker login --username AWS --password-stdin $ECR_REGISTRY
 
-              echo "Pull latest image"
-              docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
+            echo "Pull latest image"
+            docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-              echo "Restart container"
-              docker stop cloudmember || true
-              docker rm cloudmember || true
+            echo "Restart container"
+            docker stop cloudmember || true
+            docker rm cloudmember || true
 
-              docker run -d \
-                --name cloudmember \
-                -p 8080:8080 \
-                -e SPRING_PROFILES_ACTIVE=prod \
-                $ECR_REGISTRY/$ECR_REPOSITORY:latest
+            docker run -d \
+              --name cloudmember \
+              -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
             EOF
