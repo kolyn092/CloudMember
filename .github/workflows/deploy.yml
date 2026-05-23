@@ -102,12 +102,13 @@ jobs:
         run: |
           echo "password=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})" >> $GITHUB_OUTPUT
 
-      - name: Deploy via Bastion SSH
+      - name: Deploy via Bastion SSH (with Health Check)
         uses: appleboy/ssh-action@v1.0.3
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
           ECR_PASSWORD: ${{ steps.ecr-login.outputs.password }}
           PRIVATE_EC2_HOST: ${{ secrets.PRIVATE_EC2_HOST }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USERNAME }}
@@ -117,6 +118,8 @@ jobs:
             echo "Deploying directly on Bastion context..."
           
             ssh -i ec2-key.pem ec2-user@$PRIVATE_EC2_HOST << 'EOF'
+            
+            set -e
           
             aws ecr get-login-password --region ap-northeast-2 \
             | docker login --username AWS --password-stdin $ECR_REGISTRY
@@ -124,14 +127,32 @@ jobs:
             echo "Pull latest image"
             docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-            echo "Restart container"
-            docker stop cloudmember || true
-            docker rm cloudmember || true
-
-            docker run -d \
-              --name cloudmember \
-              -p 8080:8080 \
+            echo "Start new container (temporary)"
+            docker run -d --name cloudmember_new -p 8080:8080 \
               -e SPRING_PROFILES_ACTIVE=prod \
               $ECR_REGISTRY/$ECR_REPOSITORY:latest
+            
+            echo "Waiting for application startup..."
+            sleep 15
+
+            echo "Health check..."
+            if curl -f http://localhost:8080/actuator/health; then
+              echo "Health check passed ✅"
+
+              echo "Switching containers"
+              docker stop cloudmember || true
+              docker rm cloudmember || true
+
+              docker rename cloudmember_new cloudmember
+
+              echo "Deployment successful 🚀"
+            else
+              echo "Health check failed ❌"
+
+              docker stop cloudmember_new || true
+              docker rm cloudmember_new || true
+
+              exit 1
+            fi
 
             EOF
