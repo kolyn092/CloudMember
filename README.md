@@ -1,17 +1,27 @@
 # 📅 CloudMember
 
-
-
-#### 🔗 [개발 기록 링크](https://www.notion.so/361c4f021a368099a91eff9f76765e8f)
+Spring Boot 기반의 멤버 관리 REST API 서비스입니다.  
+AWS 클라우드 인프라를 활용하여 **Stateless 아키텍처**를 구현하고, 고가용성 및 글로벌 성능 최적화까지 적용한 프로젝트입니다.
 
 ---
 
 ## 📄 API 요약
 
-| Method | URL                     | Desc     |
-|:-------|:------------------------|:---------|
-| POST   | /api/members            | 멤버 생성    |
-| GET    | /api/members/{memberId} | 특정 멤버 조회 |
+| Method | URL                             | Desc        |
+|:-------|:--------------------------------|:------------|
+| POST   | /api/members                    | 멤버 생성       |
+| GET    | /api/members/{memberId}         | 특정 멤버 조회    |
+| POST   | /api/members/{id}/profile-image | 프로필 이미지 업로드 |
+| GET    | /api/members/{id}/profile-image | 프로필 이미지 조회  |
+
+---
+
+## ⚙️ 환경 설정
+
+| Profile | Database       | AWS 연동                  |
+|:--------|:---------------|:------------------------|
+| local   | H2 (In-Memory) | 비활성화                    |
+| prod    | MySQL (RDS)    | Parameter Store, S3 활성화 |
 
 ---
 
@@ -37,20 +47,19 @@
 
 #### Actuator Info 엔드포인트 URL
 
-- http://3.35.206.57:8080/actuator/info
+- https://api.kolyncloudhub.click/actuator/info
 
 #### RDS 보안 그룹 스크린샷
 
-![](https://github.com/user-attachments/assets/aacaae33-7f87-443d-9825-984f39a8a0b7)
+![](https://github.com/user-attachments/assets/cc160d9e-b19f-47e6-8f94-f7205f546691)
 
 ### LV 3 - 프로필 사진 기능 추가와 권한 관리
 
 #### 발급받은 Presigned URL 및 만료 시간
 
-- [Presigned URL]()
-- 만료 시간 : 0000/00/00 00:00:00
+- CloudFront Signed URL로 변경
 
-#### 접근 성공 스크린샷
+#### Presigned URL 접근 성공 스크린샷
 
 ![](https://github.com/user-attachments/assets/874ba260-4712-4541-9d6e-16d58970b38b)
 ![](https://github.com/user-attachments/assets/d52cb54b-53c0-459e-b6f8-b6931eadbc2a)
@@ -64,3 +73,19 @@
 #### EC2 터미널 이미지
 
 ![](https://github.com/user-attachments/assets/691b70fb-0156-4115-a91b-02c51b45d99a)
+
+### Lv 5 - 고가용성 아키텍처와 보안 도메인 연결 (ALB + ASG + HTTPS)
+
+#### HTTPS 적용된 도메인 URL
+
+- https://api.kolyncloudhub.click/actuator/health
+
+#### Target Group(대상 그룹) 이미지
+
+![](https://github.com/user-attachments/assets/02b6c197-3f14-4d54-8af0-b8460fbb211c)
+
+### Lv 6 - 글로벌 성능 최적화 (CloudFront CDN)
+
+#### CloudFront 이미지 URL
+
+https://cdn.kolyncloudhub.click/profiles/1/uploads/829cff09-9382-4ab9-99c3-c6ee78c80746_i1525806203.png?Expires=1780241151&Signature=ouKNSgh1KLG2ilXYosxVY0oP4e5nJCBfBaqCGqPhUX6jPjyW-UuCeAc8fr2WjmD19aF8f5NZ9JOmbLaDoxPaU8ar1OXniD5BC31IskSIhH8sbs5Amp5lVAphB9-ZyIonjPQfZUKl9-R1DiiI58WuQ79udL5it2JHsJ6wFSBn3f3fmbCk~Mkx9R3b5Cayh3q-5yz3uapBZI0f9farkKHxUFqQx5c-TKmntZzPU11LNLSTnw7azU~QQqiIsBijuzZkcs~k3tHVHiufE1ONCFrE0L9rMjzafevHqBrsyfdwZPXeM6F296hePm4q-LMYzFxYw4trBofr2I2l73M5j0-E8w__&Key-Pair-Id=K27VPKQXUZYZW0
