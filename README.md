@@ -1,9 +1,5 @@
 # 📅 CloudMember
 
-
-
-#### 🔗 [개발 기록 링크](https://www.notion.so/361c4f021a368099a91eff9f76765e8f)
-
 ---
 
 ## 📄 API 요약
