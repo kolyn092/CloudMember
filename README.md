@@ -1,13 +1,27 @@
 # 📅 CloudMember
 
+Spring Boot 기반의 멤버 관리 REST API 서비스입니다.  
+AWS 클라우드 인프라를 활용하여 **Stateless 아키텍처**를 구현하고, 고가용성 및 글로벌 성능 최적화까지 적용한 프로젝트입니다.
+
 ---
 
 ## 📄 API 요약
 
-| Method | URL                     | Desc     |
-|:-------|:------------------------|:---------|
-| POST   | /api/members            | 멤버 생성    |
-| GET    | /api/members/{memberId} | 특정 멤버 조회 |
+| Method | URL                             | Desc        |
+|:-------|:--------------------------------|:------------|
+| POST   | /api/members                    | 멤버 생성       |
+| GET    | /api/members/{memberId}         | 특정 멤버 조회    |
+| POST   | /api/members/{id}/profile-image | 프로필 이미지 업로드 |
+| GET    | /api/members/{id}/profile-image | 프로필 이미지 조회  |
+
+---
+
+## ⚙️ 환경 설정
+
+| Profile | Database       | AWS 연동                  |
+|:--------|:---------------|:------------------------|
+| local   | H2 (In-Memory) | 비활성화                    |
+| prod    | MySQL (RDS)    | Parameter Store, S3 활성화 |
 
 ---
 
