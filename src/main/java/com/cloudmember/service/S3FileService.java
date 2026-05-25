@@ -2,6 +2,7 @@ package com.cloudmember.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -20,7 +21,8 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-public class S3Service {
+@Profile("prod")
+public class S3FileService implements IFileService {
 
     private static final long SIGNED_URL_EXPIRATION_DAYS = 7;
 
@@ -39,11 +41,12 @@ public class S3Service {
     @Value("${spring.cloud.aws.cloudfront.private-key}")
     private String privateKeyPem;
 
-    public S3Service(S3Client s3Client) {
+    public S3FileService(S3Client s3Client) {
         this.s3Client = s3Client;
         this.cloudFrontUtilities = CloudFrontUtilities.create();
     }
 
+    @Override
     public String uploadProfileImage(Long memberId, MultipartFile file) {
         try {
             String fileName = "uploads/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -71,6 +74,7 @@ public class S3Service {
         }
     }
 
+    @Override
     public String generateSignedUrl(String key) {
         try {
             Path privateKeyPath = Files.createTempFile("cf-key", ".pem");

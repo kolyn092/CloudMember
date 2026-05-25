@@ -22,7 +22,7 @@ class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private S3Service s3Service;
+    private S3FileService s3FileService;
 
     @InjectMocks
     private MemberService memberService;
