@@ -12,11 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final S3Service s3Service;
+    private final IFileService fileService;
 
-    public MemberService(MemberRepository memberRepository, S3Service s3Service) {
+    public MemberService(MemberRepository memberRepository, IFileService fileService) {
         this.memberRepository = memberRepository;
-        this.s3Service = s3Service;
+        this.fileService = fileService;
     }
 
     private Member findMember(Long memberId) {
@@ -43,7 +43,7 @@ public class MemberService {
     public void uploadProfileImage(Long memberId, MultipartFile file) {
         Member member = findMember(memberId);
 
-        String key = s3Service.uploadProfileImage(memberId, file);
+        String key = fileService.uploadProfileImage(memberId, file);
 
         member.updateProfileImageKey(key);
     }
@@ -51,6 +51,6 @@ public class MemberService {
     public String getProfileImageUrl(Long memberId) {
         Member member = findMember(memberId);
 
-        return s3Service.generateSignedUrl(member.getProfileImageKey());
+        return fileService.generateSignedUrl(member.getProfileImageKey());
     }
 }
