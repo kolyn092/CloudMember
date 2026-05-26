@@ -3,6 +3,7 @@ package com.cloudmember.service;
 import com.cloudmember.dto.CreateMemberRequest;
 import com.cloudmember.dto.MemberResponse;
 import com.cloudmember.entity.Member;
+import com.cloudmember.exception.NotFoundException;
 import com.cloudmember.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ public class MemberService {
 
     private Member findMember(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(
-                () -> new IllegalStateException("해당 멤버가 존재하지 않습니다.")
+                () -> new NotFoundException("해당 멤버가 존재하지 않습니다.")
         );
     }
 

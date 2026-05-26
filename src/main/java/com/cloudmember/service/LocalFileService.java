@@ -1,5 +1,6 @@
 package com.cloudmember.service;
 
+import com.cloudmember.exception.FileUploadException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -9,31 +10,31 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 @Slf4j
 @Service
 @Profile("local")
-public class LocalFileService implements IFileService {
+public class LocalFileService extends AbstractFileService {
 
     @Override
     public String uploadProfileImage(Long memberId, MultipartFile file) {
+
+        validateFile(file);
+
         try {
             Path uploadPath = Paths.get("uploads", "profiles", memberId.toString());
             Files.createDirectories(uploadPath);
 
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String fileName = generateFileName(file.getOriginalFilename());
             Path filePath = uploadPath.resolve(fileName);
             Files.write(filePath, file.getBytes());
 
             log.info("[LOCAL] 파일 저장 완료: {}", filePath);
 
             // uploads/ 이후의 상대 경로만 반환 (URL용)
-            String key = "profiles/" + memberId + "/" + fileName;
-
-            return key;
+            return generateKey(memberId, fileName);
         } catch (IOException e) {
-            throw new RuntimeException("로컬 파일 저장 실패", e);
+            throw new FileUploadException("로컬 파일 저장 실패", e);
         }
     }
 

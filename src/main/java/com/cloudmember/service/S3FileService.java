@@ -1,5 +1,7 @@
 package com.cloudmember.service;
 
+import com.cloudmember.exception.FileUploadException;
+import com.cloudmember.exception.SignedUrlException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -17,12 +19,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 @Slf4j
 @Service
 @Profile("prod")
-public class S3FileService implements IFileService {
+public class S3FileService extends AbstractFileService {
 
     private static final long SIGNED_URL_EXPIRATION_DAYS = 7;
 
@@ -48,9 +49,12 @@ public class S3FileService implements IFileService {
 
     @Override
     public String uploadProfileImage(Long memberId, MultipartFile file) {
+
+        validateFile(file);
+
         try {
-            String fileName = "uploads/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
-            String key = "profiles/" + memberId + "/" + fileName;
+            String fileName = generateFileName(file.getOriginalFilename());
+            String key = generateKey(memberId, fileName);
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucket)
@@ -69,8 +73,7 @@ public class S3FileService implements IFileService {
             return key;
 
         } catch (IOException e) {
-            // 적절한 커스텀 예외로 바꾸고, GlobalExceptionHandler로 핸들링 필요
-            throw new RuntimeException("파일 업로드 실패", e);
+            throw new FileUploadException("파일 업로드 실패", e);
         }
     }
 
@@ -97,7 +100,7 @@ public class S3FileService implements IFileService {
             return signedUrl.url();
 
         } catch (Exception e) {
-            throw new RuntimeException("CloudFront Signed URL 생성 실패", e);
+            throw new SignedUrlException("CloudFront Signed URL 생성 실패", e);
         }
     }
 }
