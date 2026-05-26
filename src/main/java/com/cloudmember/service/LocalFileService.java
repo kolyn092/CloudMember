@@ -1,6 +1,5 @@
 package com.cloudmember.service;
 
-import com.cloudmember.exception.BadRequestException;
 import com.cloudmember.exception.FileUploadException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 @Slf4j
 @Service

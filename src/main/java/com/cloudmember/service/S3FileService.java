@@ -1,6 +1,5 @@
 package com.cloudmember.service;
 
-import com.cloudmember.exception.BadRequestException;
 import com.cloudmember.exception.FileUploadException;
 import com.cloudmember.exception.SignedUrlException;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 @Slf4j
 @Service
