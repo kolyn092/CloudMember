@@ -1,5 +1,6 @@
 package com.cloudmember.service;
 
+import com.cloudmember.exception.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -48,6 +49,10 @@ public class S3FileService implements IFileService {
 
     @Override
     public String uploadProfileImage(Long memberId, MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new BadRequestException("파일이 비어있습니다.");
+        }
+
         try {
             String fileName = "uploads/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
             String key = "profiles/" + memberId + "/" + fileName;
