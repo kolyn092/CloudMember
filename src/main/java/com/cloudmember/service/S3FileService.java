@@ -2,6 +2,7 @@ package com.cloudmember.service;
 
 import com.cloudmember.exception.BadRequestException;
 import com.cloudmember.exception.FileUploadException;
+import com.cloudmember.exception.SignedUrlException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -102,7 +103,7 @@ public class S3FileService implements IFileService {
             return signedUrl.url();
 
         } catch (Exception e) {
-            throw new RuntimeException("CloudFront Signed URL 생성 실패", e);
+            throw new SignedUrlException("CloudFront Signed URL 생성 실패", e);
         }
     }
 }
