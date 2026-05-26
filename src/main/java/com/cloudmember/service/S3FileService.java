@@ -25,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @Profile("prod")
-public class S3FileService implements IFileService {
+public class S3FileService extends AbstractFileService {
 
     private static final long SIGNED_URL_EXPIRATION_DAYS = 7;
 
@@ -51,13 +51,12 @@ public class S3FileService implements IFileService {
 
     @Override
     public String uploadProfileImage(Long memberId, MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new BadRequestException("파일이 비어있습니다.");
-        }
+
+        validateFile(file);
 
         try {
-            String fileName = "uploads/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
-            String key = "profiles/" + memberId + "/" + fileName;
+            String fileName = generateFileName(file.getOriginalFilename());
+            String key = generateKey(memberId, fileName);
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucket)

@@ -16,29 +16,25 @@ import java.util.UUID;
 @Slf4j
 @Service
 @Profile("local")
-public class LocalFileService implements IFileService {
+public class LocalFileService extends AbstractFileService {
 
     @Override
     public String uploadProfileImage(Long memberId, MultipartFile file) {
 
-        if (file.isEmpty()) {
-            throw new BadRequestException("파일이 비어있습니다.");
-        }
+        validateFile(file);
 
         try {
             Path uploadPath = Paths.get("uploads", "profiles", memberId.toString());
             Files.createDirectories(uploadPath);
 
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String fileName = generateFileName(file.getOriginalFilename());
             Path filePath = uploadPath.resolve(fileName);
             Files.write(filePath, file.getBytes());
 
             log.info("[LOCAL] 파일 저장 완료: {}", filePath);
 
             // uploads/ 이후의 상대 경로만 반환 (URL용)
-            String key = "profiles/" + memberId + "/" + fileName;
-
-            return key;
+            return generateKey(memberId, fileName);
         } catch (IOException e) {
             throw new FileUploadException("로컬 파일 저장 실패", e);
         }
