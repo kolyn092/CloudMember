@@ -1,5 +1,6 @@
 package com.cloudmember.service;
 
+import com.cloudmember.exception.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,11 @@ public class LocalFileService implements IFileService {
 
     @Override
     public String uploadProfileImage(Long memberId, MultipartFile file) {
+
+        if (file.isEmpty()) {
+            throw new BadRequestException("파일이 비어있습니다.");
+        }
+
         try {
             Path uploadPath = Paths.get("uploads", "profiles", memberId.toString());
             Files.createDirectories(uploadPath);
