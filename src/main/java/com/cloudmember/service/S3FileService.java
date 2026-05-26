@@ -1,6 +1,7 @@
 package com.cloudmember.service;
 
 import com.cloudmember.exception.BadRequestException;
+import com.cloudmember.exception.FileUploadException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -74,8 +75,7 @@ public class S3FileService implements IFileService {
             return key;
 
         } catch (IOException e) {
-            // 적절한 커스텀 예외로 바꾸고, GlobalExceptionHandler로 핸들링 필요
-            throw new RuntimeException("파일 업로드 실패", e);
+            throw new FileUploadException("파일 업로드 실패", e);
         }
     }
 

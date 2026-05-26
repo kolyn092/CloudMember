@@ -1,6 +1,7 @@
 package com.cloudmember.service;
 
 import com.cloudmember.exception.BadRequestException;
+import com.cloudmember.exception.FileUploadException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class LocalFileService implements IFileService {
 
             return key;
         } catch (IOException e) {
-            throw new RuntimeException("로컬 파일 저장 실패", e);
+            throw new FileUploadException("로컬 파일 저장 실패", e);
         }
     }
 
